@@ -1,5 +1,13 @@
 <?php
 
+print("
+ <head>
+  <meta charset=\"UTF-8\">
+  <link rel='stylesheet' type='text/css' href='http://designeragents.com/css/stats.css'>
+  <title>Statistics</title>
+ </head>
+ ");
+
 // Load the Google API PHP Client Library.
 require_once __DIR__ . '/vendor/autoload.php';
 $pageName = "Designer Agents";
@@ -20,7 +28,8 @@ $newUsersLastMonth = getMonthIndividualNewUsers($analytics,$VIEW_ID);
 $newUsersLastWeek = getWeekIndividualNewUsers($analytics,$VIEW_ID);
 $newUsersYesterday = getYesterdayNewUsers($analytics,$VIEW_ID);
 
-print("<a href=\"" . $pageURL . "\">"$pageName . "</a> - Rudimentary Page Statistics:<br/>");
+print("<div class=\"stats\">
+<div id=\"header\"><a href=\"" . $pageURL . "\">" . $pageName . "</a></div><br/>");
 printResults($hitsAllTime);
 print("<br/>");
 printResults($hitsLastMonth);
@@ -45,7 +54,7 @@ printResults($newUsersLastWeek);
 print("<br/>");
 printResults($newUsersYesterday);
 print("<br/><br/>");
-print("Provided Care of <a href=\"https://analytics.google.com\">Google Analytics and Google Analytics API</a>");
+print("Provided Care of <a href=\"https://analytics.google.com\">Google Analytics and Google Analytics API</a></div>");
 
 function initializeAnalytics()
 {
@@ -151,8 +160,8 @@ function getYesterdayIndividualUsers(&$analytics,$VIEW_ID) {
 
   // Create the DateRange object.
   $dateRange = new Google_Service_AnalyticsReporting_DateRange();
-  $dateRange->setStartDate("1daysAgo");
-  $dateRange->setEndDate("today");
+  $dateRange->setStartDate("2daysAgo");
+  $dateRange->setEndDate("1daysAgo");
 
   // Create the Metrics object.
   $sessions = new Google_Service_AnalyticsReporting_Metric();
@@ -256,8 +265,8 @@ function getYesterdayNewUsers(&$analytics,$VIEW_ID) {
 
   // Create the DateRange object.
   $dateRange = new Google_Service_AnalyticsReporting_DateRange();
-  $dateRange->setStartDate("1daysAgo");
-  $dateRange->setEndDate("today");
+  $dateRange->setStartDate("2daysAgo");
+  $dateRange->setEndDate("1daysAgo");
 
   // Create the Metrics object.
   $sessions = new Google_Service_AnalyticsReporting_Metric();
@@ -360,8 +369,8 @@ function getYesterdayHits(&$analytics,$VIEW_ID) {
 
   // Create the DateRange object.
   $dateRange = new Google_Service_AnalyticsReporting_DateRange();
-  $dateRange->setStartDate("1daysAgo");
-  $dateRange->setEndDate("today");
+  $dateRange->setStartDate("2daysAgo");
+  $dateRange->setEndDate("1daysAgo");
 
   // Create the Metrics object.
   $sessions = new Google_Service_AnalyticsReporting_Metric();
