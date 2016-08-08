@@ -1,7 +1,6 @@
 <?php
 
 require("curl.php");
-//require("errors.php");
 require("scrape.php");
 
 //Creates Nonsense from Wikipedia
