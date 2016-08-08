@@ -113,7 +113,7 @@ if (isset($token_data)) {
 		$postReply = $blogger->posts->insert($blogId,$post);
 		//var_dump($postReply);
 		
-		sleep($postInvl);
+		sleep($postIntvl);
 	}
 	
 	//var_dump($token_data);
