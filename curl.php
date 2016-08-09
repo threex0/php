@@ -20,3 +20,10 @@ function url_get_contents ($url) {
     curl_close($ch); //Close handle
     return $output; //Return contents
 }
+
+//Curl a URL, JSON decode as array, return Array
+function json_parse($url) {
+ $fileContents = url_get_contents($url);
+ $data = json_decode($fileContents,true);
+ return $data;
+}
