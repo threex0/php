@@ -1,3 +1,4 @@
+<?php
 //Use a curl (Especially useful if get_file_contents disabled on web host)
 //to pull all data from a URL
 function url_get_contents ($url) {
@@ -27,3 +28,4 @@ function json_parse($url) {
  $data = json_decode($fileContents,true);
  return $data;
 }
+?>
