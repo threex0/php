@@ -12,8 +12,8 @@ function send_email($message,$email) {
 	// 2 = messages only
  
 	$mail->SMTPAuth   = true;                  // enable SMTP authentication
-	$mail->Username   = "btcalert@designeragents.com"; // SMTP account username
-	$mail->Password   = "2fast2bs0d";        // SMTP account password
+	$mail->Username   = ""; // SMTP account username
+	$mail->Password   = "";        // SMTP account password
  
 	$mail->SetFrom('btcalert@designeragents.com', 'BTC Alert');
 	$mail->AddReplyTo("btcalert@designeragents.com",'BTC Alert');
