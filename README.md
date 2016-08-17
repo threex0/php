@@ -11,8 +11,10 @@ email.php - A script I generated to send email using PHPMailer.
 
 random.php - Has two functions - one creates a line of random text from Wikipedia, the other creats a paragraph of up to four randomly pulled sentences.
 
+readfile.php - Reads a string used to find a file and run through its contents line by line.  Just copy and pasted here so I can quickly copy and paste it or include it when necessary.
+
 scrape.php - Scrapes between any two patterns.  Also contains a function that removes bracketed lines like this [] in use with my autoblogger.
 
 stats.php - Is various PHP implementations of the Google Analytics API code.  Mostly for use in my personal blogging network.  Frankly I was proud I got it to work.  Mostly requires the $VIEW_ID of your website and a JSON keyfile to operate and can be used with various metrics.  I wanted to use my Analytics also as a public counter and found a good end to acheive it.
 
-I need to compress the code into something clenaer.
+I will soon compress much of this code into a functional library of functions or at least in some cases cleaner and more optimized code as I go along.
