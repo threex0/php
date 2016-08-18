@@ -1,9 +1,5 @@
 <?php
 
-require("curl.php");
-//require("errors.php");
-require("scrape.php");
-
 //Creates Nonsense from Wikipedia
 function create_nonsense() {
 	$url = "https://en.wikipedia.org/wiki/Special:Random";

@@ -1,10 +1,11 @@
 <?php
+// Automatic Blogger v0.1 by Robert Marin
+
 session_start(); //Start an HTTP Session
 require_once realpath(dirname(__FILE__) . '/vendor/autoload.php'); //Requirement to have the Google API library installed
 	//Use Composer if possible!
-require_once("env.php"); //Environment Variables
-require_once("errors.php"); //Verbose Logging
-require_once("random.php"); //Contains current loginc for random posting
+require_once("env.php"); //Environment Variables, All of your personal login information should be here.
+require_once("functions.php"); //Includes required function from my personal library
 /************************************************
   ATTENTION: Fill in these values! Make sure
   the redirect URI is to this page, e.g:
@@ -118,4 +119,6 @@ if (isset($token_data)) {
 	
 	//var_dump($token_data);
 }
+
+// Automatic Blogger v0.1 by Robert Marin
 ?>
