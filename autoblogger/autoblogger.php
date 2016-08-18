@@ -95,7 +95,7 @@ if (isset($token_data)) {
 	//Set the Blog ID
 	$blog -> setId($blogId);		
 	//Interval between posts in seconds
-	$postIntvl = 300;
+	$postIntvl = 1800;
 	
 	//echo("Entering Loop");
 	while(true) {  //Runs indefinitely.  I would cron this, but that requires an automatic login to google
@@ -108,7 +108,7 @@ if (isset($token_data)) {
 		//Set various attributes of the post below before posting them.
 		$post->setAuthor($author); 
 		$post->setBlog($blog);
-		$post->setContent($content . "<br/><br/>  My name is Autoblognonymous, I post every 5 minutes when I can.");
+		$post->setContent($content . "<br/><br/>  My name is Autoblognonymous, I post every 30 minutes when I can.");
 		$post->setTitle($title);
 		//Get a reply from the http post object
 		$postReply = $blogger->posts->insert($blogId,$post);

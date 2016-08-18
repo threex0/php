@@ -51,7 +51,7 @@ function create_nonsense() {
 		$scrape = wiki_sanitize($scrape);
 
 		$r .= purge_parenth($scrape);
-		echo($r);
+		//echo($r);
 	}
 	
 		//echo("exiting loop");
