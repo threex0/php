@@ -3,16 +3,15 @@
 print("
  <head>
   <meta charset=\"UTF-8\">
-  <link rel='stylesheet' type='text/css' href='http://designeragents.com/css/stats.css'>
   <title>Statistics</title>
  </head>
  ");
 
 // Load the Google API PHP Client Library.
 require_once __DIR__ . '/vendor/autoload.php';
-$pageName = "Designer Agents";
-$pageURL = "http://designeragents.com/";
-$VIEW_ID = "125697624";
+$pageName = "Page Name";
+$pageURL = "URL";
+$VIEW_ID = "Your View ID";
 
 $analytics = initializeAnalytics();
 $hitsAllTime = getAllHits($analytics,$VIEW_ID);
