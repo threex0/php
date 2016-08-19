@@ -1,5 +1,4 @@
 Poller v0.1 - Robert Marin - 08/19/2016
-
 props to Ricesurrenders for a quick and dirty app idea.
 
 Poller is a script which loads questions to a front-end website, then saves the questions on two different back-end databases.  If you were interested in using this script in any capacity, it's worth noting that the DB's have to be setup exactly as in the poller.php file.
