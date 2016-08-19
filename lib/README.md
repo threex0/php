@@ -1,7 +1,5 @@
 # My PHP Projects
-Various Code, mostly used around Designer Agents and Find That Price.
-
-autoblogger.php - Uses Google OAuth2 to authenticate to Blogger network, then uses random.php (which also calls scrape and curl) to pull random entries from Wikipedia and put random sentences together then automatically post it on the Blog network.  Used mostly as a test case to see if more posts translates into more hits (it does).  Now looking ot see how that translates into hits into my network, if it all.
+Various Code, mostly used around Designer Agents / Find That Price.
 
 curl.php - A generic GET I found myself using frequently for Find That Price that I reduced into a function "url_get_contents($url)" to make my life easier.
 
