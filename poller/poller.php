@@ -1,5 +1,6 @@
 <?php
-// Poller v0.1 by Robert Marin
+// Poller v0.2 by Robert Marin
+// poller.php
 // Creates a customizable set of questions read from a .txt file
 // Stores results to back end SQL DB.
 
@@ -30,7 +31,7 @@ for($i = 0; $i < $questionCount; $i++) { //Up until question count do this thing
 	// notice the $i in the HTML to id the cells differently, cell0 etc...
 	echo('<div class="poll" id="cell' . $i . '"><h1>' . $questions['q'][$i] . '</h1><div class="answers">');
 	// Then the answers in their own Div
-	$count = 0;
+	$count = 0; // Count which answer it is, relevant in determining which radio button will submit for the post
 	foreach($questions['a'][$i] as $answer) {
 		// This code used to be a bitch.  But it was solved by using a database of questions and a database of votes
 		// Now only the actual "count" of which radio button that's checked is sent to the submit process and vote db.
@@ -46,6 +47,12 @@ for($i = 0; $i < $questionCount; $i++) { //Up until question count do this thing
 if($devMode == true) { $testDate = (todays_date()); }
 $todaysDate = todays_date();
 
+// Quickly create the right number of answers for the SQL header.
+$sqlAnsStr = "";
+for($i = 0; $i < $answerCount; $i++) {
+	$sqlAnsStr .= ",Answer".($i+1);
+}
+
 // Create connection
 // Variables set in env.php
 for($i = 0; $i < $questionCount; $i++) { //Run until question count
@@ -54,10 +61,6 @@ for($i = 0; $i < $questionCount; $i++) { //Run until question count
 	// Check if there are any id's for Today's date
 	$sql = "SELECT questionId FROM QUESTIONS WHERE Date = '" . $todaysDate . "'";
 	$result = $conn->query($sql); //This actually runs the query
-	if($devMode == true) { //Only execute in dev mode
-		var_dump($result);
-		echo $conn->error;
-	}
 	
 	// If not, insert them into the questions table, god willing.
 	if($result->num_rows >= $questionCount) {
@@ -76,14 +79,13 @@ for($i = 0; $i < $questionCount; $i++) { //Run until question count
 			else {
 				$sqlAnswer .= "''";
 			}
-			if ($j < $answerCount - 1) { $sqlAnswer .= ","; } // Tricky.  Only don't append a comma if it's the second
-			// to last line.
+			if ($j < $answerCount - 1) { $sqlAnswer .= ","; } // Tricky.  Don't append a comma if it's the second
+			// to last line.  Or SQL syntax error in string.
 		}	
 		
-		// Create a completed SQL string.
-		// Still needs some work
-		// Todo:  Variable headers
-		$sql = "INSERT INTO QUESTIONS (Date,questionId,Question,Answer1,Answer2,Answer3,Answer4,Answer5,Answer6) VALUES 
+		// Create a completed SQL string useing previously constructed asset strings
+		// Said constructed strings use the "$answerCount variable to determine size dynamically
+		$sql = "INSERT INTO QUESTIONS (Date,questionId,Question" . $sqlAnsStr . ") VALUES 
 		('" . $todaysDate . "','" . $i . "','" . mysqli_escape_string($conn,$questions['q'][$i]) . "'," .
 		$sqlAnswer . ")";
 		// Show sql string if DEV mode on.
@@ -117,13 +119,6 @@ if(isset($_POST['submit'])) {
 				$result = $conn->query($sql);
 				// if any rows come back get results.
 				if($result->num_rows > 0) {
-					// Dev mode reporting
-					if($devMode == true) { 
-						echo "Line Already Exists<br/>"; 
-						echo "voting";
-						echo ($_POST['rad' . $i]) . "<br/>"; 
-					}
-					
 					// Get vote from post and add 1 to it to make it header-friendly
 					$vote = $_POST['rad' . $i] + 1;
 					// Create a string based off that number
@@ -134,18 +129,9 @@ if(isset($_POST['submit'])) {
 					
 					// Execute the Query
 					$conn->query($sql);
-					
-					//Developer mode testing.
-					if($devMode == true) { 
-						echo $sql;
-						$result = $conn->query($sql);
-						echo $conn->error;
-						var_dump($result);
-					}
 				}
 				else { //If the question id does not exist, create tose rows, then increment the vode
-						// todo:  There's code re-use here and in the line above
-						// A function is probably in order.
+						// Some negligible code re-use occurs below.
 						
 					// Loop $questionCount amount of times	
 					for($i = 0; $i < $questionCount; $i++) {	
@@ -154,30 +140,14 @@ if(isset($_POST['submit'])) {
 								('" . $todaysDate . "','" . $i . "','0','0','0','0','0','0')";
 							// Execute
 							$result = $conn->query($sql);
-							// Debug shit.
-							if($devMode == true) { 
-								echo "Inserted Today's Polls<br/>";
-								echo "Line Now Exists<br/>"; 
-								echo "voting";
-								echo ($_POST['rad' . $i]) . "<br/>"; 
-							}
 						
 						// assemble the same shit I said in the if, god dammit.
 						$vote = $_POST['rad' . $i] + 1;
 						$answerString = "A".$vote."Votes";
 						$sql = "UPDATE POLLS SET " . $answerString . " = " . $answerString . 
 						" + 1 WHERE Date = '" . $todaysDate . "' AND qid = " . $i;
-						
 						// Execute the Query
 						$conn->query($sql);
-						
-						// debug.
-						if($devMode == true) { 
-							echo $sql;
-							$result = $conn->query($sql);
-							echo $conn->error;
-							var_dump($result);
-						}
 						// Code re-use ends here.  Todo:  Turn into a function
 					}
 				}
@@ -193,11 +163,6 @@ if(isset($_POST['submit'])) {
 	}
 }
 
-// Performs the dump poll function as defined in the functions.php.
-$dbr = array($servername, $username, $password, $dbname);
-dump_poll($todaysDate,$dbr);
+echo "<div id='view_results'><h1><a href='results.php' target='someOtherWindow'>View Results</a></h1></div>";
 ?>
-
-
-
 </html>

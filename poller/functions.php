@@ -1,4 +1,8 @@
 <?php
+// Poller v0.2 by Robert Marin
+// functions.php
+// Necessary include for poller.php
+
 // Function to open "Questions.txt" file to automatically update questions every day.
 function open_questions($filename,$questionCount = 5) { //This defaults the amount of questions to pull to 5.
 	// file handle to open passed string parameter
@@ -36,17 +40,14 @@ function todays_date($s = "Y-m-d") {
 	return date($s);
 }
 
-// Todo:  Fix this shit up for sure.
 function dump_poll($date,$dbr) { //This function takes the entire SQL credentials and passes them as an array
-									//I should probably do it this way in the future TODO
 									
 	// Open two sql connections, one for votes and one for questions.
-	// GET THE ENTIRE DB FORE SOME REASON TODO
 	$conn1 = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]);
 	$conn2 = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]);
-	// Todo, razor by date plz
-	$questions = $conn1->query("SELECT * FROM QUESTIONS");
-	$votes = $conn2->query("SELECT * FROM POLLS");
+	// Select only the questions and votes where the date matches the input date.
+	$questions = $conn1->query("SELECT * FROM QUESTIONS WHERE Date ='" . $date . "'");
+	$votes = $conn2->query("SELECT * FROM POLLS WHERE Date ='" . $date . "'");
 	
 	// Initiate a blank array for the uninitiated
 	$answers = array();
@@ -61,15 +62,15 @@ function dump_poll($date,$dbr) { //This function takes the entire SQL credential
 				// $j index.
 				if ($i == 0) { $answers[$j]['date'] = $item; }
 				if ($i == 1) { $answers[$j]['qid'] = $item; }
-				if ($i == 2) { $answers[$j]['answ1'] = $item; }
-				if ($i == 3) { $answers[$j]['answ2'] = $item; }
-				if ($i == 4) { $answers[$j]['answ3'] = $item; }
-				if ($i == 5) { $answers[$j]['answ4'] = $item; }
-				if ($i == 6) { $answers[$j]['answ5'] = $item; }
-				if ($i == 7) { $answers[$j]['answ6'] = $item; }
+				if ($i >= 2) { $answers[$j]['answ'.($i - 1)] = isset($item) ? $item : NULL; } // If it's more than 2 it's an answer.
+				//  Assign accordingly
 				$i++; // This loops through the second index of an array/matrix
 				// Essentially checks column numbers
 			}	
+			// Set max answers to the amount of columns, not including "date and qid"
+			// Then one additional due to the extra iteration.
+			$maxColumns = ($i);
+			//echo $maxColumns;
 			$j++; // This loops through the first.
 		}
 	}
@@ -79,26 +80,38 @@ function dump_poll($date,$dbr) { //This function takes the entire SQL credential
 	// Start printing the storage above into a table
 	echo "<div id='results'><table style='width: 100%'>";
     if ($questions) { // If connection to Questions DB was successful.
-	  echo "<tr colspan='100%'><td>Poll for " . $date . "</td><td colspan='6'>Answers</td></tr><tr>";
+	  echo "<tr colspan='100%'><td>Poll for " . $date . "</td><td colspan='" . ($maxColumns - 2) . "'>Answers</td></tr><tr>";
 	  // This print happens by date, the load of the DB should be limited in a similar way.
 	  $j = 0; //iterator
       while($row = mysqli_fetch_object($questions)) { //Go through SQL object
 			$i = 0; //iterator
 			foreach($row as $item) { // For each question row.
+				//if($i == 0) {echo $item;} // Echo the date
 				if($i == 1) {echo "<td>Question" . $item . ": "; } // Echo question
 				if($i == 2) {echo $item . "</td>"; } // Question #, notice this is in one table def
-				if($i == 3) {echo "<td>".$item."</td>";} // Answer 1
-				if($i == 4) {echo "<td>".$item."</td>";} // Answer 2
-				if($i == 5) {echo "<td>".$item."</td></tr>";} // Answer 3
+				if($i >= 3) { //If this is a column after 3, or an Answer column
+					if( $item != "" ) { //If this shit doesn't exist don't print it.
+						echo "<td>".$item."</td>"; // But if it does.
+					}
+				} // Echo an answer header if 
+					// we're in answer range.
+				if($i == $maxColumns) {echo "</tr>";} // If you're at the end of the columns, close out the row.
 				// Todo, print a variable number of answers.
 				$i++; // iterate through items and check for column number
 			}
 			
 			// Here we echo the actual votes.  Pulled from the first loop in this function
 			echo "<tr><td>votes</td>";	// Just says 'votes'.  What?
-			echo "<td>" . $answers[$j]['answ1'] . "</td>"; // Number of votes for Answer 1
-			echo "<td>" . $answers[$j]['answ2'] . "</td>"; // Number of votes for Answer 2
-			echo "<td>" . $answers[$j]['answ3'] . "</td></tr>";	// Number of votes for Answer 3
+			$i = 0; // Looping inside a loop TWICE
+			while($i < ($maxColumns - 2)) { //Do this for each answer column
+				if( $answers[$j]['answ'.($i+1)] > 0 ) { // Print out a table def iff
+					// the answers are within the range of answer columns and the
+					// vote count is over 0.
+					echo "<td>" . $answers[$j]['answ'.($i+1)] . "</td>";
+				}
+				$i++; // loop da loop
+			}
+			echo "</tr>";	// Number of votes for Answer 3
 			$j++; // Go to the next Question.
 		}
 	}
