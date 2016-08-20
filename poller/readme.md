@@ -1,4 +1,4 @@
-Poller v0.1 - Robert Marin - 08/19/2016
+Poller v0.2 - Robert Marin - 08/19/2016
 
 props to Ricesurrenders for a quick and dirty app idea.
 
