@@ -7,6 +7,8 @@ errors.php - A copy paste job of something I found on Stack Exchange that I use 
 
 email.php - A script I generated to send email using PHPMailer.
 
+open_file.php - This script opens a file as readable and dumps entire contents as a string.
+
 random.php - Has two functions - one creates a line of random text from Wikipedia, the other creats a paragraph of up to four randomly pulled sentences.
 
 readfile.php - Reads a string used to find a file and run through its contents line by line.  
