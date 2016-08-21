@@ -1,27 +1,31 @@
 <?php
-// Poller v0.2 by Robert Marin
+// Poller v0.3 by Robert Marin
 // poller.php
-// Creates a customizable set of questions read from a .txt file
-// Stores results to back end SQL DB.
+// Creates a customizable set of questions read from a Questions/Answers DB
+// Stores votes in a votes DB.
+// Todo:  Probably add a user login option to front page to prevent duplicate votes
+// Will probably use Oauth2.
 
 // Includes
-require("env.php");
+require("env.php"); //Question and Answer Count now stored in ENV
 require("functions.php");
 
 // Throw this switch for debugging
 // Will make site ugly.
 $devMode = false;
-$questionCount = 5;  //How many questions to display and work with
-$answerCount = 6;  //Maximum amount of answers
+$todaysDate = todays_date();
+// Only set the test variable if you have to.
+if($devMode == true) { $testDate = (todays_date()); }
+
 
 // Include the beginning HTML
 // of this page to make this code cleaner.
 include("header.php");
 
-$questions = open_questions("questions.txt",$questionCount); // Load $questions with Q and A's 
+$questions = return_questions($dbr,$todaysDate); // Load $questions with Q and A's 
 	// from text file using function above
 	// lines are pipe-delimited with the first item being the question and every other item being the answer.
-
+	
 // Echo the form tag to encapsulate all the form content for submission
 echo '<form method="post">';
 // 2 or more, use a for.
@@ -41,63 +45,6 @@ for($i = 0; $i < $questionCount; $i++) { //Up until question count do this thing
 	echo '</div></div>'; // Close it out
 }
 
-// Get today's date to log entries
-// In acceptable SQL format
-// Only set the test variable if you have to.
-if($devMode == true) { $testDate = (todays_date()); }
-$todaysDate = todays_date();
-
-// Quickly create the right number of answers for the SQL header.
-$sqlAnsStr = "";
-for($i = 0; $i < $answerCount; $i++) {
-	$sqlAnsStr .= ",Answer".($i+1);
-}
-
-// Create connection
-// Variables set in env.php
-for($i = 0; $i < $questionCount; $i++) { //Run until question count
-	$conn = new mysqli($servername, $username, $password, $dbname); //init mySQL connection
-	
-	// Check if there are any id's for Today's date
-	$sql = "SELECT questionId FROM QUESTIONS WHERE Date = '" . $todaysDate . "'";
-	$result = $conn->query($sql); //This actually runs the query
-	
-	// If not, insert them into the questions table, god willing.
-	if($result->num_rows >= $questionCount) {
-		// Only outputs in development mode;
-		if($devMode == true) { echo "Questions already stored today"; }
-	}
-	else {
-		// Made this more modular and to print by question count.
-		$sqlAnswer = ""; // Reset this every time or otherwise the SQL will append to the old string
-		for($j = 0; $j < $answerCount; $j++) { //loop through $answerCount times
-			if(isset($questions['a'][$i][$j])) { //If there is a variable set it for storage (SQL Escape it)
-				$sqlAnswer .= "'" . mysqli_escape_string($conn,$questions['a'][$i][$j]) . "'";
-			}
-			// Otherwise print a null value into the database/db string.
-			// Todo:  This is a dirty fix, since the table isn't automatically inserted by the answer count
-			else {
-				$sqlAnswer .= "''";
-			}
-			if ($j < $answerCount - 1) { $sqlAnswer .= ","; } // Tricky.  Don't append a comma if it's the second
-			// to last line.  Or SQL syntax error in string.
-		}	
-		
-		// Create a completed SQL string useing previously constructed asset strings
-		// Said constructed strings use the "$answerCount variable to determine size dynamically
-		$sql = "INSERT INTO QUESTIONS (Date,questionId,Question" . $sqlAnsStr . ") VALUES 
-		('" . $todaysDate . "','" . $i . "','" . mysqli_escape_string($conn,$questions['q'][$i]) . "'," .
-		$sqlAnswer . ")";
-		// Show sql string if DEV mode on.
-		if ($devMode == true) { echo $sql; }
-		// Execute script
-		$result = $conn->query($sql);
-		// Report the error if doesn't execute for any reason.
-		if($result == false) {
-			echo $conn->error;	//Get error if $sql Query doesn't work.
-		}
-	}
-}
 echo '<div class="submit">
 	<input id="button" type="submit" name="submit" value="Submit"/>
 	</form></div>

@@ -11,6 +11,6 @@ echo '
 		
 	<body>
 	<div class="poll" id = "cell6">
-		<h1>Questions of the Day</h1> </div>
-		<div class="poll" id="cell1">';
+		<h1><a href="http://designeragents.com/poll">Questions Of The Day</a></h1> </div>
+		<div class="poll" id="wrapper">';
 		?>

@@ -1,37 +1,10 @@
 <?php
-// Poller v0.2 by Robert Marin
+// Poller v0.3 by Robert Marin
 // functions.php
 // Necessary include for poller.php
 
-// Function to open "Questions.txt" file to automatically update questions every day.
-function open_questions($filename,$questionCount = 5) { //This defaults the amount of questions to pull to 5.
-	// file handle to open passed string parameter
-	$fh = fopen($filename,"r");
-	
-	$i = 0;
-	// Run until the end of the file/file handle
-	while (!feof($fh)) {
-		$line = fgets($fh); // $line is current line, similar to a foreach but for each specific line
-		$parsedLine = explode("|",$line); // Questions text file uses pipe separated values, kaboom them.
-		$question['q'][$i] = $parsedLine[0]; // Questions array is made up of the first part of the exploded array
-			// Each first element in the array is a question as formatted by the text document
-		$question['a'][$i] = array_slice($parsedLine,1); // The answers array is everything else from the explosion
-			// consider it everything AFTER the question (which has already been exploded into a second array)
-		// var_dump($question['a']);
-			// debug shit above
-		if ($i < $questionCount) {
-				$i++; // Because I couldn't find a way to directly reference an index as a line for a file handle
-				// I resorted to increasing an integer until it met the questionCount variable, and then breaking
-				// The while loop
-		}
-		else { break; } // As so
-	}
-	
-	  if ($line === false) { //If no lines are read pitch a fit
-		throw new Exception("File read error");
-	  }
-	return $question; //return the array of questions from index 0 up until the $questionCount limitation.
-}
+// Used to open a text file with the questions here.
+// Deprecated af
 
 // This function just creates today's date in a naturally SQL friendly format.
 // But it will also take a string parameter to format date and time if you want to do that.
@@ -40,20 +13,27 @@ function todays_date($s = "Y-m-d") {
 	return date($s);
 }
 
-function dump_poll($date,$dbr) { //This function takes the entire SQL credentials and passes them as an array
+function dump_poll($date,$dbr,$dumpall = false) { //This function takes the entire SQL credentials and passes them as an array
 									
 	// Open two sql connections, one for votes and one for questions.
 	$conn1 = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]);
 	$conn2 = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]);
 	// Select only the questions and votes where the date matches the input date.
-	$questions = $conn1->query("SELECT * FROM QUESTIONS WHERE Date ='" . $date . "'");
-	$votes = $conn2->query("SELECT * FROM POLLS WHERE Date ='" . $date . "'");
+	if($dumpall == false) {
+		$questions = $conn1->query("SELECT * FROM QUESTIONS WHERE Date='" . $date . "'");
+		$votes = $conn2->query("SELECT * FROM POLLS WHERE Date='" . $date . "'");
+	}
+	else {
+		$questions = $conn1->query("SELECT * FROM QUESTIONS");
+		$votes = $conn2->query("SELECT * FROM POLLS");	
+	}
 	
 	// Initiate a blank array for the uninitiated
 	$answers = array();
 	
+	$maxColumns = 0;
 	// If connection2/votes was successful.
-	if($votes) {
+	if($votes) { 
 		$j = 0; //jiterator
 		while($row = mysqli_fetch_object($votes)) { // Loop through the SQL object
 			$i = 0; //iterator
@@ -69,8 +49,7 @@ function dump_poll($date,$dbr) { //This function takes the entire SQL credential
 			}	
 			// Set max answers to the amount of columns, not including "date and qid"
 			// Then one additional due to the extra iteration.
-			$maxColumns = ($i);
-			//echo $maxColumns;
+			$maxColumns = $i;
 			$j++; // This loops through the first.
 		}
 	}
@@ -116,6 +95,69 @@ function dump_poll($date,$dbr) { //This function takes the entire SQL credential
 		}
 	}
 	echo "</table></div>"; // Close out the table.
+}
+
+function dump_questions($dbr,$answerCount) { // v0.3 a function to dump only questions
+	$conn = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]); // New DB Connection
+	$questions = $conn->query("SELECT * FROM QUESTIONS ORDER BY Date, questionId ASC"); // Select all from the Q DB
+	// Dump all questions
+	
+	echo "<table><tr><td>Date</td><td>QID</td><td>Question</td>";
+	for($i = 0; $i < $answerCount; $i++) {
+		echo '<td>Answer ' . ($i + 1) . '</td>';
+	}
+	echo '<td>Delete</td></tr><tr>';
+	while($row = mysqli_fetch_object($questions)) {
+		$i = 0; // Iterator
+		foreach($row as $item) { // Each object comes back as an array
+			if($i == 0) { $ddate = $item; echo '<tr>'; } // Create Date and row on the first item
+			if($i == 1) { $qid = $item; } // Set question ID for deletion
+			echo "<td>" . $item . "</td>"; // Echo all items
+			if($i == $answerCount + 2) { 
+			echo '<td><a href="?ddate=' . $ddate . '&id=' . $qid . '" style="color: black;" onclick="confirm()">[x]</a></td>';
+				echo '</tr>';
+			} // Close row on last item
+			$i++; // Iterate
+		}
+	}
+	echo '</table>'; // Close out table
+}
+
+function return_questions($dbr,$date) {
+// file handle to open passed string parameter
+// Todo:  Merge above function with this one.
+	$conn = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]); // New DB Connection for Q/A's
+	$sql = "SELECT * FROM QUESTIONS WHERE Date='" . $date . "' ORDER BY questionId ASC"; // Get all questions from a
+		// Specific Date.
+	$results = $conn->query($sql);
+	echo $conn->error;
+
+	$questions = array();
+	while($row = mysqli_fetch_object($results)) {
+		$i = 0;		
+		foreach($row as $item) {
+			if($i == 0) { $question['date'] = $item; } ; // Set date of question array
+			if($i == 1) { $id = $item; } // Set an id variable, saves headache
+			if($i == 2) { 
+				$questions['q'][$id] = $item; // Set this specific column to the question.
+			}
+			if($i >= 3 && $item !== "") { // Everything from here should be answers unless blank
+				$questions['a'][$id][($i - 3)] = $item; // Asign by iterator minus 3 as a column offset
+			}
+			$i++; // Increase.
+		}
+	}
+	
+	return $questions;
+}
+
+// This function deletes questions.
+function delete_question($dbr,$date,$id) { // Pass the following variables
+	$conn = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]); // New DB Connection
+	$sql = "DELETE FROM QUESTIONS WHERE Date = '" . $date . "' AND questionID = '" . $id . "'"; // Construct a SQL query
+	$delete = $conn->query($sql); // Delete the first entry which matches this thing.  Should be unique.
+	echo $conn->error; // Echo error if there is one.
+	echo "ID: " . $id . "Date: " . $date . " DELETED!<br/>";
 }
 
 // ----------------------------------------------------------------------------------------------------
