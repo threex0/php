@@ -1,14 +1,27 @@
-Poller v0.2 - Robert Marin - 08/19/2016
+Poller v0.3 - Robert Marin - 08/19/2016
+================================================================================
+v0.3 changelog
+Added "edit.php".  Edit.php allows you to have an admin interface.  Allows for deletion and creation of new questions.  Todo:  Questions will automatically populate at the end of the db, but not in the middle.  This is a bug, and coupled with another bug that you'll see unset indexes on your main page if a questionID for a date isn't set, is planned to be fix over the next few days.
 
+Env.php now contains some config variables, they need a home and I will probably end up moving them.  Also considering creating language and string files.
+
+Header.php minor change div class to 'wrapper' as it was serendipitous that everything was wrapped inside a div that set a default style.  I think this div needs to be closed.
+
+Poller.php now reads questions from a pre-populated database (populated from edit.php).  Still saves votes in votes db.  Needing a file to store questions is gone, and so are two functions from v0.2, one of which was pretty bloated and allowed me to compress poller.php into something much more readable.
+
+Results.php - Results now has an ability to dump the entire database (as does the function it calls on).  Also pages through old results.  Issetor to prevent errors, Todo: but needs a bounds set by oldest date.
+
+Closing in on a finished product.
+==================================================================================
 props to Ricesurrenders for a quick and dirty app idea.
 
-Poller is a script which loads questions to a front-end website, then saves the questions on two different back-end databases.  If you were interested in using this script in any capacity, it's worth noting that the DB's have to be setup exactly as in the poller.php file.
+Poller is a script which loads questions to a front-end website, then saves the questions on two different back-end databases. If you were interested in using this script in any capacity, it's worth noting that the DB's have to be setup exactly as in the poller.php file.
 
-It reads information from a large text file containing the questions/answers line by line.  The questions and answers are pipe delimited.  The first field is the question and all other fields are answers.  It's done this way as to be automated, so questions can easily be added to the text file and removed, however since I already have two databases going I'm eventually going to make a simple admin tool which allows you to manually add questions/answers on the back end via the DB.  However the way it works now is it reads the question from a text file, then prints them to a main page (an amount of your chosing), then they are replicated from there into the database.  It isn't clean, but it works enough to get the project of the ground.
+It reads and writes information from a database containing the questions/answers line by line. It's automated so that when items are added via edit.php they automatically stack to the end of a file.  A pre-set number of questions is asked a day.
 
-Poller tallies votes, and contains a function to print them to a nice neat little table.  The DB takes six votes but the current table printing only prints 3 to accomodate our test cases.  Also, Poller currently prints out the whole database instead of just today's.  This will all be fixed and variabled in the future, but it was done just for testing purposes/prove of concept/mvp.  I've put a ton of To Do around the code, but expect to have a fully functional and self-maintaining thing over the next few days.
+Poller tallies votes, and contains a function to print them to a nice neat little table.  You can post dates manually to it making it configurable.  Automatically links to the previous day as well to see results from other days.
 
-Poller currently uses an env.php file for SQL db info, an included functions file, and a header file (just an echo of some basic HTML/CSS, an include but not a require).  All should be included in this repo.
+Poller currently uses an env.php file for SQL db, an included functions file, and a header file (just an echo of some basic HTML/CSS, an include but not a require).  Also stores the question/answercount as a config. All should be included in this repo.
 
 A working demo of this can be seen here:
 http://designeragents.com/poll/
