@@ -1,5 +1,5 @@
 <?php
-// Poller v0.3 by Robert Marin
+// Poller v0.31 by Robert Marin
 // functions.php
 // Necessary include for poller.php
 
@@ -70,6 +70,7 @@ function dump_poll($date,$dbr,$dumpall = false) { //This function takes the enti
 				if($i == 2) {echo $item . "</td>"; } // Question #, notice this is in one table def
 				if($i >= 3) { //If this is a column after 3, or an Answer column
 					if( $item != "" ) { //If this shit doesn't exist don't print it.
+						$maxAnswers = $i - 2;
 						echo "<td>".$item."</td>"; // But if it does.
 					}
 				} // Echo an answer header if 
@@ -88,6 +89,8 @@ function dump_poll($date,$dbr,$dumpall = false) { //This function takes the enti
 					// vote count is over 0.
 					echo "<td>" . $answers[$j]['answ'.($i+1)] . "</td>";
 				}
+				elseif ( $i >= $maxAnswers ) { echo ""; } // These two lines now make sure cells print for
+				else { echo "<td></td>"; }					// The right amount of answers.
 				$i++; // loop da loop
 			}
 			echo "</tr>";	// Number of votes for Answer 3
