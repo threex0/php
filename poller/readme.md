@@ -1,6 +1,7 @@
 Poller v0.4 - Robert Marin - 08/19/2016
 ================================================================================
 v0.4 changelog
+
 Feature - Editing Questions.  Questions can now be direclty edited from edit.php.  Some snazzy images have been included.
 
 Fixed bug where items would not add automatically into middle of stack of viewed/displayed ID's.  A logic was created to first check if each date had the right amount of questions, then cycle through to add a missing one where necessary.  This is an optimized version of the code to address a possibly very large database.  Although due to the above feature this should have to happen very rarely.
