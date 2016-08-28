@@ -7,17 +7,17 @@ Feature - Editing Questions.  Questions can now be direclty edited from edit.php
 Fixed bug where items would not add automatically into middle of stack of viewed/displayed ID's.  A logic was created to first check if each date had the right amount of questions, then cycle through to add a missing one where necessary.  This is an optimized version of the code to address a possibly very large database.  Although due to the above feature this should have to happen very rarely.
 
 Future:
-Code optimizations
-Fix bug where submission happens on date submitted instead of date of questions (only happens if the screen is open and the date changes while the questions are still loaded.)
-Fix Javascript confirmation button to only delete on confirmation and to display a message
+-Code optimizations
+-Fix bug where submission happens on date submitted instead of date of questions (only happens if the screen is open and the date changes while the questions are still loaded.)
+-Fix Javascript confirmation button to only delete on confirmation and to display a message
 Enhance Look/Feel with Javascript
 
 v0.32 changelog
-Fixed bug where columns where not lining up with data (due to not printing empty columns)
-Fixed bug where zero votes were not being printed where applicable, minor but makes the site more readable and necessary for future theming
+-Fixed bug where columns where not lining up with data (due to not printing empty columns)
+-Fixed bug where zero votes were not being printed where applicable, minor but makes the site more readable and necessary for future theming
 Set a date boundary feature so Poller only prints to original date
 
--v0.3 changelog-
+v0.3 changelog
 Added "edit.php".  Edit.php allows you to have an admin interface.  Allows for deletion and creation of new questions.  Todo:  Questions will automatically populate at the end of the db, but not in the middle.  This is a bug, and coupled with another bug that you'll see unset indexes on your main page if a questionID for a date isn't set, is planned to be fix over the next few days.
 
 Env.php now contains some config variables, they need a home and I will probably end up moving them.  Also considering creating language and string files.
