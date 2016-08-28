@@ -20,12 +20,12 @@ function dump_poll($date,$dbr,$dumpall = false) { //This function takes the enti
 	$conn2 = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]);
 	// Select only the questions and votes where the date matches the input date.
 	if($dumpall == false) {
-		$questions = $conn1->query("SELECT * FROM QUESTIONS WHERE Date='" . $date . "'");
-		$votes = $conn2->query("SELECT * FROM POLLS WHERE Date='" . $date . "'");
+		$questions = $conn1->query("SELECT * FROM QUESTIONS WHERE Date='" . $date . "' ORDER BY questionId ASC");
+		$votes = $conn2->query("SELECT * FROM POLLS WHERE Date='" . $date . "' ORDER BY qid ASC");
 	}
 	else {
-		$questions = $conn1->query("SELECT * FROM QUESTIONS");
-		$votes = $conn2->query("SELECT * FROM POLLS");	
+		$questions = $conn1->query("SELECT * FROM QUESTIONS ORDER BY questionId ASC ORDER BY questionId ASC");
+		$votes = $conn2->query("SELECT * FROM POLLS ORDER BY qid ASC");	
 	}
 	
 	// Initiate a blank array for the uninitiated
@@ -90,7 +90,7 @@ function dump_poll($date,$dbr,$dumpall = false) { //This function takes the enti
 					echo "<td>" . $answers[$j]['answ'.($i+1)] . "</td>";
 				}
 				elseif ( $i >= $maxAnswers ) { echo ""; } // These two lines now make sure cells print for
-				else { echo "<td></td>"; }					// The right amount of answers.
+				else { echo "<td>0</td>"; }					// The right amount of answers.
 				$i++; // loop da loop
 			}
 			echo "</tr>";	// Number of votes for Answer 3
@@ -100,7 +100,7 @@ function dump_poll($date,$dbr,$dumpall = false) { //This function takes the enti
 	echo "</table></div>"; // Close out the table.
 }
 
-function dump_questions($dbr,$answerCount) { // v0.3 a function to dump only questions
+function dump_questions($dbr,$answerCount) { // v0.3 a function to dump questions to HTML table
 	$conn = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]); // New DB Connection
 	$questions = $conn->query("SELECT * FROM QUESTIONS ORDER BY Date, questionId ASC"); // Select all from the Q DB
 	// Dump all questions
@@ -109,7 +109,7 @@ function dump_questions($dbr,$answerCount) { // v0.3 a function to dump only que
 	for($i = 0; $i < $answerCount; $i++) {
 		echo '<td>Answer ' . ($i + 1) . '</td>';
 	}
-	echo '<td>Delete</td></tr><tr>';
+	echo '</tr><tr>';
 	while($row = mysqli_fetch_object($questions)) {
 		$i = 0; // Iterator
 		foreach($row as $item) { // Each object comes back as an array
@@ -117,7 +117,8 @@ function dump_questions($dbr,$answerCount) { // v0.3 a function to dump only que
 			if($i == 1) { $qid = $item; } // Set question ID for deletion
 			echo "<td>" . $item . "</td>"; // Echo all items
 			if($i == $answerCount + 2) { 
-			echo '<td><a href="?ddate=' . $ddate . '&id=' . $qid . '" style="color: black;" onclick="confirm()">[x]</a></td>';
+			echo '<td><a href="?ddate=' . $ddate . '&id=' . $qid . '" style="color: black;" onclick="confirm()"><img src="images/delete.png" /></a></td>';
+			echo '<td><a href="?edate=' . $ddate . '&id=' . $qid . '" style="color: black;" target="edit_window"><img src="images/edit.png" /></a></td>';
 				echo '</tr>';
 			} // Close row on last item
 			$i++; // Iterate
@@ -161,6 +162,31 @@ function delete_question($dbr,$date,$id) { // Pass the following variables
 	$delete = $conn->query($sql); // Delete the first entry which matches this thing.  Should be unique.
 	echo $conn->error; // Echo error if there is one.
 	echo "ID: " . $id . "Date: " . $date . " DELETED!<br/>";
+}
+
+// This function loads a question to edit and submit edit
+function edit_question($dbr,$date,$id,$answerCount) { // Pass Database Array, Date, and ID
+	$conn = new mysqli($dbr[0], $dbr[1], $dbr[2], $dbr[3]); // New DB Connection
+	$sql = "SELECT * FROM QUESTIONS WHERE Date = '" . $date . "' AND questionID = '" . $id . "'"; // Construct a SQL query
+	$edit = $conn->query($sql); // Delete the first entry which matches this thing.  Should be unique.
+	echo $conn->error; // Echo error if there is one.
+	//var_dump($edit);
+	
+	// Print prior fields as placeholders.
+	echo '<form method = "post">';
+	// Iterate through SQL query and print appropriate fields
+	// Todo: Do as many times ans AnswerCount
+	// Todo:  Possibly tablefy or find some other way to call out the specific fields
+	while($row = mysqli_fetch_object($edit)) {
+		$i = 0; // Iterator
+		foreach($row as $item) { // Each object comes back as an array
+			echo '<input class="editField" type="text" name="editor' . $i  . '" value="' . $item . '" />'; // Echo a field foreach
+				// Each field in the DB
+			$i++; // Iterate
+		}
+	}
+	echo '<input type="submit" name="edit" value="Edit" />
+	</form>';	
 }
 
 // ----------------------------------------------------------------------------------------------------
