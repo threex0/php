@@ -48,14 +48,39 @@ function show_dom_node(DOMNode $domNode) {
     if(!isset($tag_array)) { $tag_array = array(); }
     foreach ($domNode->childNodes as $node)
     {
-        //echo "<div>" . htmlspecialchars($node->nodeName.':'.$node->nodeValue) . "</div>";
+        echo "<div>" . htmlspecialchars($node->nodeName.':'.$node->nodeValue) . "</div>";
         $tag_array[$node->nodeName]++;
         if($node->hasChildNodes()) {
             show_dom_node($node);
         }
     }
 
-    return "hello";
+    if($node === end( $domNode->childNodes ) ) { echo "hello"; }
 }
 
+function open_table($r) {
+    $s = "<table>";
+    foreach($r as $item) {
+        $s .= "<th>" . $item . "</th>";
+    }
+    return $s;
+}
+
+function print_table_rows($r) {
+    $s = "<tr><td class='link_name'><a href='" . $r[0] . "'>" . implode( ",",$r[1] ) . "</a></td><td>" . $r[0] . "</td><td>" . $r[2] . "</td></tr>";
+    return $s;
+}
+
+function close_table() {
+    return "</table>";
+}
+
+function array_sort_by_column(&$arr, $col, $dir = SORT_ASC) {
+    $sort_col = array();
+    foreach ($arr as $key=> $row) {
+        $sort_col[$key] = $row[$col];
+    }
+
+    array_multisort($sort_col, $dir, $arr);
+}
 ?>
