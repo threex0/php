@@ -1,13 +1,28 @@
+<!DOCTYPE HTML>
 <style>
-    body {
+    body, table {
         font-family: verdana;
-        font-size: 10px;
+        font-size: 12px;
+    }
+    table {
+        background-color: #DDDDDD;
+        border: solid 1px black;
+        border-radius: 15px;
+        padding-bottom: 10px;
     }
     td {
+        background-color: white;
         border: solid 1px black;
     }
     .link_name {
         width: 15%;
+    }
+    .line-graph {
+        background-color: aqua;
+    }
+    .line_graph {
+        background-color: black;
+        width: 100px;
     }
     #search{
         margin-left: auto;
@@ -46,30 +61,8 @@ if(isset($_GET['url'])) {
     //$url = ['g' => 'http://www.google.com', 't' => 'http://www.investors.com/category/market-trend/stock-market-today/'];
     $html = url_get_contents($_GET['url']);
     $dom = new Query($html);
-    $results = $dom->execute('a');
+    $link_results = $dom->execute('a');
 
-    $cols = ["Link Text", "Address", "Count"];
-
-    $r = Array();
-    foreach ($results as $result) {
-        ;
-        if (!isset($r[$result->getAttribute('href')]['count'])) {
-            $r[$result->getAttribute('href')]['count'] = 0;
-        }
-        $r[$result->getAttribute('href')]['count']++;
-        if (in_array($result->textContent, $r[$result->getAttribute('href')]['text'])) {
-            continue;
-        }
-        $r[$result->getAttribute('href')]['text'][] = $result->textContent;
-        //echo print_table_rows( [ $result->getAttribute('href'), $result->textContent ] );
-    }
-//var_dump($r);
-
-    array_sort_by_column($r, 'count', SORT_DESC);
-    echo open_table($cols);
-    foreach ($r as $k => $v) {
-        echo print_table_rows([$k, $v['text'], $v['count']]);
-    }
-    echo close_table();
+    print_links($link_results);
 }
 ?>

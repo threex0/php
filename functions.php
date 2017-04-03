@@ -66,8 +66,12 @@ function open_table($r) {
     return $s;
 }
 
-function print_table_rows($r) {
-    $s = "<tr><td class='link_name'><a href='" . $r[0] . "'>" . implode( ",",$r[1] ) . "</a></td><td>" . $r[0] . "</td><td>" . $r[2] . "</td></tr>";
+function print_link_rows($r) {
+    $s = "<tr>
+            <td class='link_name'><a href='" . $r[0] . "'>" . implode( "</a>, <a href='" . $r[0] . "'>",$r[1] ) . "</a></td>
+            <td>" . count($r[1]) . "</td><td>" . $r[0] . "</td><td>" . $r[2] . "</td>
+            <td class='line_graph'><div class='line-graph' style='width: " . ( round($r[2] / $r[3] * 100 ) ) . "%;'>&nbsp;</div></td>
+          </tr>";
     return $s;
 }
 
@@ -82,5 +86,33 @@ function array_sort_by_column(&$arr, $col, $dir = SORT_ASC) {
     }
 
     array_multisort($sort_col, $dir, $arr);
+}
+
+function print_links($results) {
+    $cols = ["Link Text","Txt Count", "Address", "Link Count"];
+    $r = Array();
+    foreach ($results as $result) {
+        ;
+        if (!isset($r[$result->getAttribute('href')]['count'])) {
+            $r[$result->getAttribute('href')]['count'] = 0;
+        }
+        $r[$result->getAttribute('href')]['count']++;
+        if (in_array($result->textContent, $r[$result->getAttribute('href')]['text'])) {
+            continue;
+        }
+        $r[$result->getAttribute('href')]['text'][] = $result->textContent;
+        //echo print_table_rows( [ $result->getAttribute('href'), $result->textContent ] );
+    }
+
+    //array_filter($r);
+    array_sort_by_column($r, 'count', SORT_DESC);
+    $k = key($r);
+    $max_count = $r[$k]['count']; // Should probably be driving this with max(), take note if the sort changes
+
+    echo "<h3>links</h3>" . open_table($cols);
+    foreach ($r as $k => $v) {
+        echo print_link_rows([$k, $v['text'], $v['count'],$max_count]);
+    }
+    echo close_table();
 }
 ?>
